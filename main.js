@@ -160,7 +160,7 @@ fetchData(currentPage).then((data) => {
       //Узнаем индекс LI и подставляемс с него данные 
       const index = Array.from(allLi).indexOf(target);
       const modalData = dataGlobal[index];
-      
+
       //Рендер инф. в модальном окне
       modalContent.innerHTML = `
       <h5>${modalData.name}</h5>
@@ -171,15 +171,17 @@ fetchData(currentPage).then((data) => {
       if (e.target.matches('button[btn-name="delete"]')) {
         target.remove();
         res.textContent = "";
+      }else {
+        openModal();
       }
     }
-    openModal();
   });
 
   //Функционал кнопки Restor
-  restoreBtn.addEventListener("click", () => {
+  restoreBtn.addEventListener("click", (e) => {
     const listItems = document.querySelectorAll("li");
     const result = document.querySelector(".res span");
+    
 
     if (listItems.length > 0) {
       listItems.forEach((item) => {
