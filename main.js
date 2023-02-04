@@ -13,10 +13,11 @@ const searchBtn = document.getElementById("search");
 let dataGlobal = [];
 
 const renderList = (elements) => {
+  let index = 0;
   return elements
     .map(
       (current) =>
-        `<li>
+        `<li data-index="${index++}">
     <img src="${current.image}">
       <div class="wrap-item">
         <div class='name-content'>Имя:
@@ -81,11 +82,14 @@ prevPageButton.addEventListener("click", () => {
 searchBtn.addEventListener("click", () => {
   let searchInput = document.getElementById("search-input");
   let searchRadio = document.querySelector('input[name="status"]:checked');
+  //Если инпут пустая строка
   if (!searchInput.value) {
     alert("Please enter a value in the search input field.");
     searchInput.value = "";
     return;
   }
+
+  //Если не выбрана радио кнопка поиск делает поиск по имени
   if (!searchRadio) {
     fetch(
       `https://rickandmortyapi.com/api/character/?name=${searchInput.value}`
@@ -102,12 +106,13 @@ searchBtn.addEventListener("click", () => {
       });
     return;
   }
+
+  //Поиск если инпут заполнен и выбрана радио кнопка
   fetch(
     `https://rickandmortyapi.com/api/character/?name=${searchInput.value}&status=${searchRadio.value}`
   )
     .then((res) => res.json())
     .then((data) => {
-      console.log(data);
       dataGlobal = data.results;
       output.innerHTML = renderList(dataGlobal);
       searchInput.value = "";
@@ -148,17 +153,19 @@ fetchData(currentPage).then((data) => {
     const modalContent = document.querySelector(".modal-content");
     let target = e.target.closest("li");
     if (target) {
+      //Добавление обводки для LI с добавлением класса
       let allLi = document.querySelectorAll("li");
       allLi.forEach((li) => {
         li.classList.remove("active");
       });
       target.classList.add("active");
 
+      //Вывод имени нажатой карточки
       const res = document.querySelector(".res span");
       res.textContent = target.querySelectorAll("p")[0].textContent;
 
       //Узнаем индекс LI и подставляемс с него данные 
-      const index = Array.from(allLi).indexOf(target);
+      const index = target.getAttribute('data-index')
       const modalData = dataGlobal[index];
 
       //Рендер инф. в модальном окне
@@ -168,10 +175,11 @@ fetchData(currentPage).then((data) => {
       <p>${modalData.species}</p> 
       `;
 
+      //Удаления LI при нажатие на кнопку с атр.[btn-name="delete"]
       if (e.target.matches('button[btn-name="delete"]')) {
         target.remove();
         res.textContent = "";
-      }else {
+      }else{
         openModal();
       }
     }
