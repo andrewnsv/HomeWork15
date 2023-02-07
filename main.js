@@ -3,17 +3,15 @@ const restoreBtn = document.getElementById("restore-btn");
 
 const nextPageButton = document.querySelector(".next");
 const prevPageButton = document.querySelector(".prev");
-let currentPage = 1;
 const currentPageNumber = document.querySelector(".curr-page");
-
-const statusSelect = document.getElementById("status-select");
 
 const searchBtn = document.getElementById("search");
 const searchInput = document.getElementById("search-input");
-
+let currentPage = 1;
 let setName;
 let setRadioValue;
 let dataGlobal = [];
+// let dataPages;
 
 const renderList = (elements) => {
   let index = 0;
@@ -21,18 +19,18 @@ const renderList = (elements) => {
     .map(
       (current) =>
         `<li data-index="${index++}">
-    <img src="${current.image}">
-      <div class="wrap-item">
-        <div class='name-content'>Имя:
-            <p>${current.name}</p>
-        </div>
-        <div class='name-content'>Статус:
-            <p> ${current.status}</p>
-        </div>
-        <div class='name-content'>Раса: 
-            <p>${current.species}</p>
-        </div>
-        <button btn-name="delete">Delete Block</button>
+          <img src="${current.image}">
+          <div class="wrap-item">
+          <div class='name-content'>Имя:
+              <p>${current.name}</p>
+          </div>
+          <div class='name-content'>Статус:
+              <p> ${current.status}</p>
+          </div>
+          <div class='name-content'>Раса: 
+              <p>${current.species}</p>
+          </div>
+          <button btn-name="delete">Delete Block</button>
       </div>
   </li>`
     )
@@ -58,7 +56,6 @@ nextPageButton.addEventListener("click", () => {
   currentPageNumber.textContent = currentPage;
 
   fetchData(currentPage, setName, setRadioValue).then((data) => {
-
     dataGlobal = data.results;
     if (data.info.next === null) {
       nextPageButton.setAttribute("disabled", true);
@@ -78,7 +75,7 @@ prevPageButton.addEventListener("click", () => {
   fetchData(currentPage, setName, setRadioValue).then((data) => {
     dataGlobal = data.results;
     if (data.info.next !== null) {
-      nextPageButton.removeAttribute("disabled", true);
+      nextPageButton.removeAttribute("disabled");
     }
     if (data.info.prev === null) {
       prevPageButton.setAttribute("disabled", true);
@@ -91,11 +88,11 @@ prevPageButton.addEventListener("click", () => {
 searchBtn.addEventListener("click", () => {
   // Если инпут пустая строка
   if (!searchInput.value) {
-    alert("Please enter a value in the search input field.");
+    openModal("Please enter a value in the search input field.");
     searchInput.value = "";
     return;
   }
-  
+
   let selectedValue = null;
   const searchRadio = document.querySelector('input[name="status"]:checked');
   selectedValue = searchRadio ? searchRadio.value : null;
@@ -103,9 +100,15 @@ searchBtn.addEventListener("click", () => {
   // Поиск с учетом выбора radio или без него
   fetchData(currentPage, searchInput.value, selectedValue)
     .then((data) => {
+      if(data.info.next === null){
+        nextPageButton.setAttribute("disabled", true);
+      }
+      if(data.info.next){
+        nextPageButton.removeAttribute("disabled");
+      }
       dataGlobal = data.results;
       setName = searchInput.value;
-      setRadioValue = selectedValue
+      setRadioValue = selectedValue;
       searchInput.value = "";
       output.innerHTML = renderList(dataGlobal);
     })
@@ -190,3 +193,14 @@ fetchData(currentPage).then((data) => {
     output.innerHTML = renderList(dataGlobal);
   });
 });
+
+// fetch(`https://www.omdbapi.com/?s=dream&page=2&apikey=9b67fc54`)
+//   .then((res) => res.json())
+//   .then((data) => {
+//     const urlParams = new URL(
+//       "https://www.omdbapi.com/?s=dream&page=2&apikey=9b67fc54"
+//     );
+//     const page = urlParams.searchParams.get("page");
+//     console.log(page);
+//     console.log(data);
+//   });
